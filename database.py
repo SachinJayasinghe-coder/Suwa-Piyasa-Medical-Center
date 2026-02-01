@@ -1,11 +1,14 @@
 import sqlite3
+import os
 
-conn = sqlite3.connect("suwapiyasa_v2.db", check_same_thread=False)
+DB_PATH = "suwapiyasa.db"
+
+conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
 
-# USERS TABLE (5 columns)
+# ---------------- USERS ----------------
 c.execute("""
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     username TEXT PRIMARY KEY,
     full_name TEXT,
     email TEXT,
@@ -14,9 +17,9 @@ CREATE TABLE users (
 )
 """)
 
-# APPOINTMENTS TABLE
+# ---------------- APPOINTMENTS ----------------
 c.execute("""
-CREATE TABLE appointments (
+CREATE TABLE IF NOT EXISTS appointments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     appointment_no TEXT UNIQUE,
 
@@ -35,9 +38,9 @@ CREATE TABLE appointments (
 )
 """)
 
-# MEDICAL RECORDS
+# ---------------- MEDICAL RECORDS ----------------
 c.execute("""
-CREATE TABLE records (
+CREATE TABLE IF NOT EXISTS records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT,
     notes TEXT,
@@ -45,14 +48,19 @@ CREATE TABLE records (
 )
 """)
 
-# LIVE STATUS
+# ---------------- LIVE STATUS ----------------
 c.execute("""
-CREATE TABLE live_status (
+CREATE TABLE IF NOT EXISTS live_status (
     id INTEGER PRIMARY KEY,
     current_patient INTEGER,
     available INTEGER
 )
 """)
 
-c.execute("INSERT OR IGNORE INTO live_status VALUES (1, 0, 1)")
+# Initialize live status safely
+c.execute("""
+INSERT OR IGNORE INTO live_status (id, current_patient, available)
+VALUES (1, 0, 1)
+""")
+
 conn.commit()
